@@ -1,0 +1,11 @@
+Package: ACTIONcore
+Type: Package
+Title: Main decomposition component of the ACTION framework
+Version: 1.0
+Date: 2019-01-01
+Author: Shahin Mohammadi
+Maintainer: Shahin Mohammadi <mohammadi@broadinstitute.org>
+Description: This implements the combination of archetypal analysis+convex NMF
+License: GPL (>= 2)
+Imports: Rcpp (>= 0.12.12)
+LinkingTo: Rcpp,RcppArmadillo

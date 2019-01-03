@@ -1,0 +1,8 @@
+[submodule "modules/core"]
+	path = modules/core
+	url = git@github.com:shmohammadi86/ACTIONcore.git
+	branch = master
+[submodule "modules/reduction"]
+	path = modules/reduction
+	url = git@github.com:shmohammadi86/ACTIONred.git
+	branch = master

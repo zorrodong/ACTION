@@ -1,0 +1,9 @@
+*.o
+*.so
+*.a
+*.mexa64
+.Rhistory
+*~
+input/*
+results/*
+tmp/*

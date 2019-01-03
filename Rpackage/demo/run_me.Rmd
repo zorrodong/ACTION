@@ -1,0 +1,57 @@
+---
+title: "Demo of ACTION run"
+output: html_notebook
+---
+### Import expression matrix
+
+```{r message=FALSE, warning=FALSE}
+require(Matrix)
+
+input_path = '../../input/datasets/MouseBrain';
+fname = paste(input_path, 'preprocessed.RDS', sep='/')
+if(!file.exists(fname)) {
+  expression = readMM(paste(input_path, 'expression.mm', sep='/'));
+  gene_names = read.table(paste(input_path, 'gene_names.txt', sep='/'), as.is = T)$V1
+  sample_annotations = read.table(paste(input_path, 'sample_annotations.txt', sep='/'), header = T)
+  RNASeq = list(expression = expression, gene_names = gene_names, sample_annotations = sample_annotations)
+  saveRDS(RNASeq, fname)
+} else {
+  RNASeq = readRDS(fname)
+}
+
+Labels = as.character(RNASeq$sample_annotations$Labels)
+UL = sort(unique(Labels))
+labels = match(Labels, UL)
+```
+
+## Run ACTION
+```{r}
+require(Matrix)
+require(ACTIONcore)
+require(irlba)
+
+S_r = t(prcomp_irlba(t(RNASeq$expression), 30)$x)
+
+ACTION.results = runACTION(S_r, 2, 20, 8)
+C_trace = ACTION.results$C
+H_trace = ACTION.results$H
+```
+
+## Discretize results and evaluate clusters
+```{r message=FALSE, warning=FALSE}
+require(ClusterR)
+
+ARI = array(0, dim = c(20, 1))
+NMI = array(0, dim = c(20, 1))
+for(k in 2:20) {
+  H = H_trace[[k]]
+  predicted_celltype = apply(H, 2, which.max)
+  ARI[k] = external_validation(labels, predicted_celltype, method = "adjusted_rand_index")
+  NMI[k] = external_validation(labels, predicted_celltype, method = "nmi")
+}
+
+plot(2:20, ARI[2:20], xlab = '# archs', ylab = 'ARI')
+plot(2:20, NMI[2:20], xlab = '# archs', ylab = 'NMI')
+```
+
+
