@@ -26,10 +26,6 @@ plot(explained_var); xlabel('# components'); ylabel('Explained variance');
 S = S_r'*S_r;
 plotKernel_HeatMap(S, Labels);
 drawnow();
-
-
-Y = tsne(S_r');
-figure; gscatter(Y(:, 1), Y(:, 2), Labels); drawnow();
 %% Run ACTION
 [C_trace, H_trace] = runACTION(S_r, 2, 20, 8);        
 
@@ -51,4 +47,6 @@ figure; plot(2:20, ACTION_NMI(2:20)); xlabel('# archs'); ylabel('NMI');
 k = numel(UL);
 H = H_trace{k};
 [~, predicted_celltyps] = max(H);
-figure; gscatter(Y(:, 1), Y(:, 2), predicted_celltyps); drawnow();
+
+%% Build ACTIONet
+    build

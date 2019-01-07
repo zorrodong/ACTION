@@ -1,3 +1,2 @@
-useDynLib(ACTIONcore, .registration=TRUE)
 exportPattern("^[[:alpha:]]+")
 importFrom(Rcpp, evalCpp)

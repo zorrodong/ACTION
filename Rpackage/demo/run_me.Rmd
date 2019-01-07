@@ -2,12 +2,12 @@
 title: "Demo of ACTION run"
 output: html_notebook
 ---
-### Import expression matrix
 
+## Import expression matrix
 ```{r message=FALSE, warning=FALSE}
 require(Matrix)
 
-input_path = '../../input/datasets/MouseBrain';
+input_path = '../../../datasets/MouseBrain/RNA/';
 fname = paste(input_path, 'preprocessed.RDS', sep='/')
 if(!file.exists(fname)) {
   expression = readMM(paste(input_path, 'expression.mm', sep='/'));
@@ -25,14 +25,17 @@ labels = match(Labels, UL)
 ```
 
 ## Run ACTION
-```{r}
+```{r message=FALSE, warning=FALSE}
 require(Matrix)
-require(ACTIONcore)
-require(irlba)
+require(ACTION)
 
-S_r = t(prcomp_irlba(t(RNASeq$expression), 30)$x)
+reduction.out = reduceGeneExpression(RNASeq$expression, reduced_dim = 30, method = 1)
+S_r = reduction.out$S_r
 
-ACTION.results = runACTION(S_r, 2, 20, 8)
+k_min = 2
+k_max = 15
+ACTION.results = runACTION(S_r, k_min = k_min, k_max = k_max, numThreads = 8)
+
 C_trace = ACTION.results$C
 H_trace = ACTION.results$H
 ```
@@ -41,17 +44,18 @@ H_trace = ACTION.results$H
 ```{r message=FALSE, warning=FALSE}
 require(ClusterR)
 
-ARI = array(0, dim = c(20, 1))
-NMI = array(0, dim = c(20, 1))
-for(k in 2:20) {
+ARI = array(0, dim = c(k_max, 1))
+NMI = array(0, dim = c(k_max, 1))
+for(k in k_min:k_max) {
   H = H_trace[[k]]
   predicted_celltype = apply(H, 2, which.max)
   ARI[k] = external_validation(labels, predicted_celltype, method = "adjusted_rand_index")
   NMI[k] = external_validation(labels, predicted_celltype, method = "nmi")
 }
 
-plot(2:20, ARI[2:20], xlab = '# archs', ylab = 'ARI')
-plot(2:20, NMI[2:20], xlab = '# archs', ylab = 'NMI')
+plot(k_min:k_max, ARI[k_min:k_max], xlab = '# archs', ylab = 'ARI')
+plot(k_min:k_max, NMI[k_min:k_max], xlab = '# archs', ylab = 'NMI')
+
 ```
 
 

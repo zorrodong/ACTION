@@ -11,7 +11,7 @@ MATLAB_FLAGS=-DUSE_BLAS_LIB -DAXPBY -DINT_64BITS -DNDEBUG -largeArrayDims
 MATLAB = $(shell matlab -e | sed -n 's/MATLAB=//p')
 MEX = $(MATLAB)/bin/mex
 
-.PHONY: all matlab R clean $(libraries)
+.PHONY: all $(libraries) $(LIBNAME) matlab Rmodules R clean
 all: $(LIBNAME)
 
 $(libraries):
@@ -23,10 +23,11 @@ $(LIBNAME): $(libraries)
 matlab:
 	$(MAKE) matlab --directory=$(lib_reduction)
 	$(MAKE) matlab --directory=$(lib_core)
-    
-R:
+  
+R:	
 	$(MAKE) R --directory=$(lib_reduction)
-	$(MAKE) R --directory=$(lib_core)	
+	$(MAKE) R --directory=$(lib_core)
+	R CMD INSTALL Rpackage/	
 
 clean:
 	rm -f $(LIBNAME)
